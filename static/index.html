@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HTMX Hello World</title>
+    <title>To-Do List with HTMX and Go</title>
     <script src="https://unpkg.com/htmx.org@1.9.4"></script>
 </head>
 <body>
 
-<button hx-get="/hello" hx-target="#message">Click me!</button>
-<div id="message"></div>
+<h2>To-Do List</h2>
+
+<input type="text" id="newTask">
+<button hx-post="/add?task=value:#newTask" hx-swap="beforeend" hx-target="#taskList">Add Task</button>
+
+<ul id="taskList"></ul>
 
 </body>
 </html>
+

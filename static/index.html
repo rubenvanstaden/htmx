@@ -6,85 +6,90 @@
     <title>Ixian - Welcome</title>
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: auto;
-            padding: 20px;
-            background-color: #f6f8fa;
-        }
+    body {
+        font-family: 'Courier New', monospace; /* Added the hacker font */
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        background-color: #F5F5F5; /* Light gray background */
+        color: #333333; /* Dark gray text */
+    }
 
-        #logo {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
+    #logo {
+        font-size: 2.5em;
+        font-weight: bold;
+        color: #333333; /* Dark gray color */
+        border-bottom: 2px solid #333333; /* Dark gray border */
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+    }
 
-        p {
-            color: #2c3e50;
-            font-size: 1.1em;
-        }
+    p {
+        color: #333333; /* Dark gray text */
+        font-size: 1.1em;
+    }
 
-        form {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-        }
+    form {
+        background-color: #FFFFFF; /* White background */
+        padding: 20px;
+        border: 1px solid #B0B0B0; /* Medium gray border */
+        box-shadow: none; /* Removed shadow */
+        border-radius: 8px; /* Rounded corners */
+    }
 
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-        }
+    label {
+        display: block;
+        margin-bottom: 8px;
+        color: #333333; /* Dark gray color */
+    }
 
-        input, textarea {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            font-size: 1em;
-            transition: border 0.3s;
-        }
+    input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #B0B0B0; /* Medium gray border */
+    color: #333333; /* Dark gray text */
+    background-color: #FFFFFF; /* White background */
+    border-radius: 6px; /* Rounded corners */
+    box-sizing: border-box; /* This is the key line */
+}
 
-        input:focus, textarea:focus {
-            border-color: #3498db;
-        }
+    input:focus, textarea:focus {
+        outline-color: #333333; /* Dark gray outline color for focus */
+    }
 
-        button {
-            background-color: #3498db;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
+    button {
+        background-color: #333333; /* Dark gray background */
+        color: #FFFFFF; /* White text */
+        padding: 10px 15px;
+        border: none;
+        cursor: pointer;
+        border-radius: 6px; /* Rounded corners */
+    }
 
-        button:hover {
-            background-color: #2980b9;
-        }
+    button:hover {
+        background-color: #B0B0B0; /* Medium gray background on hover */
+        color: #FFFFFF; /* White text on hover */
+    }
 
-        #messages {
-            margin-top: 20px;
-        }
+    #messages {
+        margin-top: 20px;
+    }
 
-        #messages div {
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
-            margin-top: 10px;
-        }
+    #messages div {
+        background-color: #FFFFFF; /* White background */
+        padding: 10px;
+        border: 1px solid #B0B0B0; /* Medium gray border */
+        color: #333333; /* Dark gray text */
+        border-radius: 6px; /* Rounded corners */
+        margin-bottom: 10px; /* Space between messages */
+    }
 
-        #messages strong {
-            color: #2c3e50;
-        }
-    </style>
+    #messages strong {
+        color: #333333; /* Dark gray color */
+    }
+</style>
+
 </head>
 <body>
 

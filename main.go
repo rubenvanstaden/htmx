@@ -6,55 +6,63 @@ import (
 	"sync"
 )
 
-type Task struct {
-	ID   int
-	Text string
+type Message struct {
+	ID      int
+	Name    string
+	Email   string
+	Content string
 }
 
-var tasks []Task
+var messages []Message
 var idCounter int
 var mu sync.Mutex
 
 func main() {
-	http.HandleFunc("/add", addTask)
-	http.HandleFunc("/remove", removeTask)
+	http.HandleFunc("/contact", contactHandler)
+    http.HandleFunc("/latest-messages", latestMessagesHandler) // new endpoint
 	http.Handle("/", http.FileServer(http.Dir("./static")))
 
 	fmt.Println("Server started on :8080")
 	http.ListenAndServe(":8080", nil)
 }
 
-func addTask(w http.ResponseWriter, r *http.Request) {
+func contactHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	taskText := r.URL.Query().Get("task")
-	if taskText == "" {
-		http.Error(w, "Task text is required", http.StatusBadRequest)
-		return
-	}
+    err := r.ParseForm()
+    if err != nil {
+        http.Error(w, "Failed to parse form", http.StatusBadRequest)
+        return
+    }
+
+    name := r.PostFormValue("name")
+    email := r.PostFormValue("email")
+    content := r.PostFormValue("content")
+
+    if name == "" || email == "" || content == "" {
+        http.Error(w, "All fields are required", http.StatusBadRequest)
+        return
+    }
 
 	idCounter++
-	task := Task{
-		ID:   idCounter,
-		Text: taskText,
+	message := Message{
+		ID:      idCounter,
+		Name:    name,
+		Email:   email,
+		Content: content,
 	}
 
-	tasks = append(tasks, task)
-	fmt.Fprintf(w, "<li data-task-id='%d'>%s <a href='#' hx-post='/remove?id=%d' hx-target='closest li' hx-swap='outerHTML'>[Remove]</a></li>", task.ID, task.Text, task.ID)
+	messages = append(messages, message)
+
+	fmt.Fprintf(w, "<div><strong>%s (%s)</strong>: %s</div>", message.Name, message.Email, message.Content)
 }
 
-func removeTask(w http.ResponseWriter, r *http.Request) {
+func latestMessagesHandler(w http.ResponseWriter, r *http.Request) {
 	mu.Lock()
 	defer mu.Unlock()
 
-	taskID := r.URL.Query().Get("id")
-	for index, task := range tasks {
-		if fmt.Sprintf("%d", task.ID) == taskID {
-			tasks = append(tasks[:index], tasks[index+1:]...)
-			break
-		}
+	for _, message := range messages {
+		fmt.Fprintf(w, "<div><strong>%s (%s)</strong>: %s</div>", message.Name, message.Email, message.Content)
 	}
-
-	w.WriteHeader(http.StatusOK)
 }

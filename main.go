@@ -1,68 +1,80 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
+	"log"
 	"net/http"
-	"sync"
 )
 
-type Message struct {
-	ID      int
-	Name    string
-	Email   string
-	Content string
+type Data struct {
+	Title       string
+	Content     string
+	Contacts    []Contact
+	SearchQuery string
 }
 
-var messages []Message
-var idCounter int
-var mu sync.Mutex
+type Contact struct {
+	Id    int
+	First string
+	Last  string
+	Phone string
+	Email string
+}
+
+type Client struct {
+	db map[string]Contact
+}
 
 func main() {
-	http.HandleFunc("/contact", contactHandler)
-    http.HandleFunc("/latest-messages", latestMessagesHandler) // new endpoint
-	http.Handle("/", http.FileServer(http.Dir("./static")))
 
-	fmt.Println("Server started on :8080")
+	client := Client{
+		db: make(map[string]Contact),
+	}
+
+	client.db["alice"] = Contact{
+		Id:    0,
+		First: "alice",
+	}
+
+	client.db["bob"] = Contact{
+		Id:    1,
+		First: "bob",
+	}
+
+	http.HandleFunc("/", client.indexHandler)
+	http.HandleFunc("/contact", client.contact)
+	http.HandleFunc("/update", client.updateHandler)
+
 	http.ListenAndServe(":8080", nil)
 }
 
-func contactHandler(w http.ResponseWriter, r *http.Request) {
-	mu.Lock()
-	defer mu.Unlock()
+func (s *Client) contact(w http.ResponseWriter, r *http.Request) {
 
-    err := r.ParseForm()
-    if err != nil {
-        http.Error(w, "Failed to parse form", http.StatusBadRequest)
-        return
-    }
+	q := r.URL.Query().Get("q")
 
-    name := r.PostFormValue("name")
-    email := r.PostFormValue("email")
-    content := r.PostFormValue("content")
-
-    if name == "" || email == "" || content == "" {
-        http.Error(w, "All fields are required", http.StatusBadRequest)
-        return
-    }
-
-	idCounter++
-	message := Message{
-		ID:      idCounter,
-		Name:    name,
-		Email:   email,
-		Content: content,
+	data := Data{
+		Title:       "HTMX with Go",
+		SearchQuery: q,
 	}
 
-	messages = append(messages, message)
+    log.Printf("%s", q)
 
-	fmt.Fprintf(w, "<div><strong>%s (%s)</strong>: %s</div>", message.Name, message.Email, message.Content)
+	data.Contacts = append(data.Contacts, s.db["alice"])
+	data.Contacts = append(data.Contacts, s.db["bob"])
+
+	tmpl, err := template.ParseFiles("template/layout.html", "template/index.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tmpl.ExecuteTemplate(w, "layout.html", data)
 }
 
-func latestMessagesHandler(w http.ResponseWriter, r *http.Request) {
-	mu.Lock()
-	defer mu.Unlock()
+func (s *Client) indexHandler(w http.ResponseWriter, r *http.Request) {
+    http.Redirect(w, r, "/contact", http.StatusMovedPermanently)
+}
 
-	for _, message := range messages {
-		fmt.Fprintf(w, "<div><strong>%s (%s)</strong>: %s</div>", message.Name, message.Email, message.Content)
-	}
+func (s *Client) updateHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Updated Content using HTMX and Go!"))
 }

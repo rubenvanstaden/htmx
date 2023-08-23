@@ -5,6 +5,7 @@ import (
 	"html/template"
 	"log"
 	"net/http"
+	"net/mail"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -13,7 +14,7 @@ import (
 type Data struct {
 	Title       string
 	Content     string
-	Contacts    []Contact
+	Contacts    []*Contact
 	SearchQuery string
 }
 
@@ -23,6 +24,7 @@ type Contact struct {
 	Last  string
 	Phone string
 	Email string
+    Error string
 }
 
 // Assuming a function to save the contact; for this example, it just returns true.
@@ -68,6 +70,7 @@ func main() {
 		First: "alice",
         Email: "alice@gmail.com",
         Phone: "000",
+        Error: "none",
 	}
 
 	client.db[1] = &Contact{
@@ -75,6 +78,7 @@ func main() {
 		First: "bob",
         Email: "bob@gmail.com",
         Phone: "001",
+        Error: "none",
 	}
 
 	r := mux.NewRouter()
@@ -85,6 +89,7 @@ func main() {
 	r.HandleFunc("/contact/new", client.ContactsNewPostHandler).Methods("POST")
 	r.HandleFunc("/contact/{contact_id:[0-9]+}", client.ContactViewHandler).Methods("POST")
 	r.HandleFunc("/contact/{contact_id:[0-9]+}/edit", client.ContactEditHandler).Methods("GET")
+    r.HandleFunc("/contact/{contact_id:[0-9]+}/email", client.ContactEmailGetHandler).Methods("GET")
 	r.HandleFunc("/contact/{contact_id:[0-9]+}/edit", client.ContactEditPostHandler).Methods("POST")
     r.HandleFunc("/contact/{contact_id:[0-9]+}", client.ContactDeletePostHandler).Methods("DELETE")
 
@@ -92,6 +97,20 @@ func main() {
     if err != nil {
         log.Fatalln("There's an error with the server", err)
     }
+}
+
+func (s *Client) ContactEmailGetHandler(w http.ResponseWriter, r *http.Request) {
+
+    log.Println("Checking mail")
+
+    email := r.URL.Query().Get("email")
+
+	if _, err := mail.ParseAddress(email); err != nil {
+        log.Println("invalid email")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte("Invalid email address"))
+		return
+	}
 }
 
 func (s *Client) ContactDeletePostHandler(w http.ResponseWriter, r *http.Request) {
@@ -137,14 +156,14 @@ func (s *Client) ContactEditPostHandler(w http.ResponseWriter, r *http.Request) 
     if c.Save() {
         http.Redirect(w, r, fmt.Sprintf("/contact/%d", contactID), http.StatusSeeOther)
     } else {
-		data.Contacts = append(data.Contacts, *c)
+		data.Contacts = append(data.Contacts, c)
         tmpl.ExecuteTemplate(w, "layout.html", data) // Renders the template with the contact data.
     }
 }
 
 func (s *Client) ContactEditHandler(w http.ResponseWriter, r *http.Request) {
 
-	log.Println("Editing Contact")
+	log.Println("Editing Contact GET")
 
 	tmpl, err := template.ParseFiles("template/layout.html", "template/edit.html")
 	if err != nil {
@@ -166,7 +185,7 @@ func (s *Client) ContactEditHandler(w http.ResponseWriter, r *http.Request) {
 
 	c := s.Find(contactID)
 
-    data.Contacts = append(data.Contacts, *c)
+    data.Contacts = append(data.Contacts, c)
 
 	tmpl.ExecuteTemplate(w, "layout.html", data)
 }
@@ -205,7 +224,7 @@ func (s *Client) ContactHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
     for _, contact := range s.db {
-        data.Contacts = append(data.Contacts, *contact)
+        data.Contacts = append(data.Contacts, contact)
     }
 
 	tmpl, err := template.ParseFiles("template/layout.html", "template/index.html")
@@ -223,6 +242,7 @@ func (s *Client) ContactsNewGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	data := Data{
 		Title: "HTMX with Go",
+		SearchQuery: "",
 	}
 
 	tmpl, err := template.ParseFiles("template/layout.html", "template/new.html")
@@ -231,7 +251,7 @@ func (s *Client) ContactsNewGetHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-    data.Contacts = append(data.Contacts, Contact{})
+    data.Contacts = append(data.Contacts, &Contact{})
 
     tmpl.ExecuteTemplate(w, "layout.html", data)
 }

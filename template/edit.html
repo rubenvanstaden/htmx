@@ -6,10 +6,15 @@
 <form action="/contact/{{.Id}}/edit" method="post">
     <fieldset>
         <legend>Contact Values</legend>
-          <p>
-              <label for="email">Email</label>
-              <input name="email" id="email" type="text" placeholder="Email" value="{{ .Email }}">
-          </p>
+            <p>
+                <label for="email">Email</label>
+                <input name="email" id="email" type="text"
+                    hx-get="/contact/{{.Id}}/email"
+                    hx-target="next .error"
+                   hx-trigger="change, keyup delay:200ms changed" (1)
+                    placeholder="Email" value="{{.Email}}">
+                <span class="error"></span>
+            </p>
           <p>
               <label for="first_name">First Name</label>
               <input name="first_name" id="first_name" type="text" placeholder="First Name" value="{{ .First }}">

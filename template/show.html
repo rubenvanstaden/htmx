@@ -1,0 +1,15 @@
+{{ block "content" . }}
+
+<h1>{{ .First }} {{ .Last }}</h1>
+
+<div>
+    <div>Phone: {{ .Phone }}</div>
+    <div>Email: {{ .Email }}</div>
+</div>
+
+<p>
+    <a href="/contact/{{.id}}/edit">Edit</a>
+    <a href="/contact">Back</a>
+</p>
+
+{{ end }}

@@ -81,11 +81,12 @@ func main() {
 
 	r.HandleFunc("/", client.IndexHandler)
 	r.HandleFunc("/contact", client.ContactHandler)
-	r.HandleFunc("/contact/new/", client.ContactsNewHandler)
-	r.HandleFunc("/contact/{contact_id:[0-9]+}", client.ContactViewHandler)
+	r.HandleFunc("/contact/new", client.ContactsNewGetHandler).Methods("GET")
+	r.HandleFunc("/contact/new", client.ContactsNewPostHandler).Methods("POST")
+	r.HandleFunc("/contact/{contact_id:[0-9]+}", client.ContactViewHandler).Methods("POST")
 	r.HandleFunc("/contact/{contact_id:[0-9]+}/edit", client.ContactEditHandler).Methods("GET")
 	r.HandleFunc("/contact/{contact_id:[0-9]+}/edit", client.ContactEditPostHandler).Methods("POST")
-    r.HandleFunc("/contact/{contact_id:[0-9]+}/delete", client.ContactDeletePostHandler).Methods("POST")
+    r.HandleFunc("/contact/{contact_id:[0-9]+}", client.ContactDeletePostHandler).Methods("DELETE")
 
     err := http.ListenAndServe(":8080", r)
     if err != nil {
@@ -194,6 +195,8 @@ func (s *Client) ContactViewHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Client) ContactHandler(w http.ResponseWriter, r *http.Request) {
 
+    log.Println("Contact new contact")
+
 	q := r.URL.Query().Get("q")
 
 	data := Data{
@@ -214,9 +217,9 @@ func (s *Client) ContactHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "layout.html", data)
 }
 
-func (s *Client) ContactsNewHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Client) ContactsNewGetHandler(w http.ResponseWriter, r *http.Request) {
 
-    log.Println("Adding new contact")
+    log.Println("Getting new contact")
 
 	data := Data{
 		Title: "HTMX with Go",
@@ -228,34 +231,36 @@ func (s *Client) ContactsNewHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if r.Method == http.MethodPost {
+    data.Contacts = append(data.Contacts, Contact{})
 
-		log.Println("POST new contact")
-
-		c := &Contact{
-			Id:    3,
-			First: r.FormValue("first_name"),
-			Last:  r.FormValue("last_name"),
-			Phone: r.FormValue("phone"),
-			Email: r.FormValue("email"),
-		}
-
-		if c.Save() {
-			// Equivalent of Flask's flash function - you'd need to implement a way to show flash messages in Go.
-			// For now, skipping it.
-			http.Redirect(w, r, "/contact/", http.StatusSeeOther)
-		} else {
-			tmpl.ExecuteTemplate(w, "layout.html", c) // Renders the template with the contact data.
-		}
-	} else if r.Method == http.MethodGet {
-		log.Println("GET running")
-		data.Contacts = append(data.Contacts, Contact{})
-		tmpl.ExecuteTemplate(w, "layout.html", data) // Renders the template with the contact data.
-	} else {
-		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
-	}
+    tmpl.ExecuteTemplate(w, "layout.html", data)
 }
 
 func (s *Client) IndexHandler(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/contact", http.StatusMovedPermanently)
+}
+
+func (s *Client) ContactsNewPostHandler(w http.ResponseWriter, r *http.Request) {
+
+    log.Println("Posting new contact")
+
+	tmpl, err := template.ParseFiles("template/layout.html", "template/new.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+    c := &Contact{
+        Id:    3,
+        First: r.FormValue("first_name"),
+        Last:  r.FormValue("last_name"),
+        Phone: r.FormValue("phone"),
+        Email: r.FormValue("email"),
+    }
+
+    if c.Save() {
+        http.Redirect(w, r, "/contact", http.StatusSeeOther)
+    } else {
+        tmpl.ExecuteTemplate(w, "layout.html", c)
+    }
 }

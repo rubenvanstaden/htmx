@@ -1,10 +1,16 @@
 {{ block "content" . }}
 
-<form action="/contact" method="get" class="tool-bar">
-    <label for="search">Search Term</label>
-    <input id="search" type="search" name="q" value="{{ .SearchQuery }}"/>
-    <input type="submit" value="Search"/>
-</form>
+<div id="main">
+
+  <form>
+      <label for="search">Search Contacts:</label>
+      <input id="search" name="q" type="search" placeholder="Search Contacts">
+      <button hx-post="/contact" hx-target="#main" hx-include="#search">
+        Search The Contacts
+      </button>
+  </form>
+
+</div>
 
 <table>
     <thead>
@@ -29,7 +35,7 @@
 </table>
 
 <p>
-    <a href="/contact/new/">Add Contact</a>
+    <a href="/contact/new">Add Contact</a>
 </p>
 
 {{ end }}

@@ -1,9 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{ .Title }}</title>
+    <title>
+        {{ .Title }}
+    </title>
+    <script src="https://unpkg.com/htmx.org@1.9.4"></script>
 </head>
-<body>
+<body hx-boost="true">
     <h1>{{ .Title }}</h1>
     {{ template "content" . }}
 </body>

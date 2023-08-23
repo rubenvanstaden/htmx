@@ -3,7 +3,7 @@
 
 {{ range .Contacts }}
 
-<form action="/contact/{{ .Id }}/edit" method="post">
+<form action="/contact/{{.Id}}/edit" method="post">
     <fieldset>
         <legend>Contact Values</legend>
           <p>
@@ -26,9 +26,12 @@
     </fieldset>
 </form>
 
-<form action="/contact/{{ .Id }}/delete" method="post">
-    <button>Delete Contact</button>
-</form>
+<button hx-delete="/contact/{{ .Id }}"
+        hx-push-url="true"
+        hx-confirm="Are you sure you want to delete this contact?"
+        hx-target="body">
+Delete Contact
+</button>
 
 <p>
     <a href="/contact/">Back</a>

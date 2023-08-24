@@ -1,14 +1,30 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>
-        {{ .Title }}
-    </title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{{ .Title }}</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css" />
     <script src="https://unpkg.com/htmx.org@1.9.2"></script>
 </head>
-<body hx-boost="true">
-    <h1>{{ .Title }}</h1>
-    {{ template "content" . }}
+
+<body id="mainbody" hx-boost="true">
+
+    <!-- Header -->
+    <header class="container">
+      <hgroup>
+        <h1>Ixian</h1>
+        <h2>Beyond APIs: Innovating the Ixian Way.</h2>
+      </hgroup>
+    </header>
+
+    <!-- Main -->
+    <main class="container">
+        {{ template "content" . }}
+    </main>
+
 </body>
+
 </html>
 

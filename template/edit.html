@@ -1,46 +1,48 @@
-{{ block "content" . }}
-
 {{ range .Contacts }}
 
-<form action="/contact/{{.Id}}/edit" method="post">
-    <fieldset>
-        <legend>Contact Values</legend>
-            <p>
-                <label for="email">Email</label>
-                <input name="email" id="email" type="text"
-                    hx-get="/contact/{{.Id}}/email"
-                    hx-target="next .error"
-                   hx-trigger="change, keyup delay:200ms changed" (1)
-                    placeholder="Email" value="{{.Email}}">
-                <span class="error"></span>
-            </p>
-          <p>
-              <label for="first_name">First Name</label>
-              <input name="first_name" id="first_name" type="text" placeholder="First Name" value="{{ .First }}">
-          </p>
-          <p>
-              <label for="last_name">Last Name</label>
-              <input name="last_name" id="last_name" type="text" placeholder="Last Name" value="{{ .Last }}">
-          </p>
-          <p>
-              <label for="phone">Phone</label>
-              <input name="phone" id="phone" type="text" placeholder="Phone" value="{{ .Phone }}">
-          </p>
-        <button>Save</button>
-    </fieldset>
-</form>
+<!-- Main -->
+<main class="container">
 
-<button hx-delete="/contact/{{ .Id }}"
-        hx-push-url="true"
-        hx-confirm="Are you sure you want to delete this contact?"
-        hx-target="body">
-Delete Contact
-</button>
+    <!-- Form elements-->
+    <section id="form">
+    <form action="/contact/{{.Id}}/edit" method="post">
 
-<p>
-    <a href="/contact/">Back</a>
-</p>
+        <h2>Contact Values</h2>
 
-{{ end }}
+        <!-- Email -->
+        <label for="email">Email</label>
+        <input name="email" id="email" type="text"
+            hx-get="/contact/{{.Id}}/email"
+            hx-target="next .error"
+            hx-trigger="change, keyup delay:200ms changed" (1)
+            placeholder="Email" value="{{.Email}}">
+        <small class="error text-danger"></small>
+
+        <!-- Username -->
+        <label for="first_name">Username</label>
+        <input name="first_name" id="first_name" type="text" placeholder="First Name" value="{{ .First }}">
+
+        <div class="grid">
+
+            <button type="submit">Submit</button>
+
+            <button class="secondary"
+                    hx-delete="/contact/{{ .Id }}"
+                    hx-push-url="true"
+                    hx-confirm="Are you sure you want to delete this contact?"
+                    hx-target="body">
+                Delete
+            </button>
+        </div>
+
+    </form>
+    </section>
+    <!-- ./ Form elements-->
+
+    <p>
+        <a href="/contact/">Back</a>
+    </p>
+
+</main>
 
 {{ end }}

@@ -1,40 +1,37 @@
-{{ block "content" . }}
-
 {{ range .Contacts }}
 
-<form action="/contact/new" method="post">
-    <fieldset>
-        <legend>Contact Values</legend>
-        <div class="table rows">
-            <p>
-                <label for="email">Email</label>
-                <input name="email" id="email" type="email"
-                    hx-get="/contact/{{.Id}}/email"
-                    hx-target="next .error"
-                    hx-trigger="change, keyup"
-                   placeholder="Email" value="{{ .Email }}">
-            </p>
-            <p>
-                <label for="first_name">First Name</label>
-                <input name="first_name" id="first_name" type="text" placeholder="First Name" value="{{ .First }}">
-            </p>
-            <p>
-                <label for="last_name">Last Name</label>
-                <input name="last_name" id="last_name" type="text" placeholder="Last Name" value="{{ .Last }}">
-            </p>
-            <p>
-                <label for="phone">Phone</label>
-                <input name="phone" id="phone" type="text" placeholder="Phone" value="{{ .Phone }}">
-            </p>
-        </div>
-        <button>Save</button>
-    </fieldset>
-</form>
+<!-- Main -->
+<main class="container">
 
-<p>
-    <a href="/contact">Back</a>
-</p>
+    <!-- Form elements-->
+    <section id="form">
+    <form action="/contact/new" method="post">
 
-{{ end }}
+        <h2>Contact Values</h2>
+
+        <!-- Email -->
+        <label for="email">Email</label>
+        <input name="email" id="email" type="text"
+            hx-get="/contact/{{.Id}}/email"
+            hx-target="next .error"
+            hx-trigger="change, keyup delay:200ms changed" (1)
+            placeholder="Email" value="{{.Email}}">
+        <small class="error text-danger"></small>
+
+        <!-- Username -->
+        <label for="first_name">Username</label>
+        <input name="first_name" id="first_name" type="text" placeholder="First Name" value="{{ .First }}">
+
+        <button type="submit">Submit</button>
+
+    </form>
+    </section>
+    <!-- ./ Form elements-->
+
+    <p>
+        <a href="/contact/">Back</a>
+    </p>
+
+</main>
 
 {{ end }}

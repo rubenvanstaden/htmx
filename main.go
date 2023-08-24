@@ -187,7 +187,7 @@ func (s *Client) ContactEditHandler(w http.ResponseWriter, r *http.Request) {
 
 	data.Contacts = append(data.Contacts, c)
 
-	tmpl.ExecuteTemplate(w, "layout.html", data)
+	tmpl.ExecuteTemplate(w, "edit.html", data)
 }
 
 func (s *Client) ContactViewHandler(w http.ResponseWriter, r *http.Request) {
@@ -296,7 +296,7 @@ func (s *Client) ContactsNewGetHandler(w http.ResponseWriter, r *http.Request) {
 
 	data.Contacts = append(data.Contacts, &Contact{})
 
-	tmpl.ExecuteTemplate(w, "layout.html", data)
+	tmpl.ExecuteTemplate(w, "new.html", data)
 }
 
 func (s *Client) IndexHandler(w http.ResponseWriter, r *http.Request) {
@@ -324,6 +324,6 @@ func (s *Client) ContactsNewPostHandler(w http.ResponseWriter, r *http.Request) 
 	if c.Save() {
 		http.Redirect(w, r, "/contact", http.StatusSeeOther)
 	} else {
-		tmpl.ExecuteTemplate(w, "layout.html", c)
+		tmpl.ExecuteTemplate(w, "new.html", c)
 	}
 }

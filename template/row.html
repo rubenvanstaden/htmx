@@ -7,8 +7,13 @@
     <td>{{ .Phone }}</td>
     <td>{{ .Email }}</td>
     <td>
-        <a href="/contact/{{.Id}}/edit">Edit</a>
-        <a href="/contact/{{.Id}}">View</a>
+        <div class="grid">
+          <p>
+            <a href="/contact/{{ .Id }}/edit">Edit</a>
+          <p>
+            <a href="/contact/{{ .Id }}">View</a>
+          </p>
+        </div>
     </td>
 </tr>
 {{ end }}
@@ -17,11 +22,10 @@
 <tr>
     <td colspan="5" style="text-align: center">
         <span hx-target="closest tr"
-                hx-trigger="revealed"
                 hx-swap="outerHTML"
                 hx-select="tbody > tr"
                 hx-get="/contact?page={{ add .Page 1 }}">
-          Loading...
+          Load More
         </span>
     </td>
 </tr>

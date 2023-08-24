@@ -1,2 +1,3 @@
 # htmx
+
 Basic htmx setup

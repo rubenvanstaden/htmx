@@ -1,35 +1,48 @@
 {{ block "content" . }}
 
-<div id="main">
+<!-- Form elements-->
+<section id="form">
+    <form>
 
-  <form>
-      <label for="search">Search Contacts:</label>
-      <input id="search" name="q" type="search" placeholder="Search Contacts">
-      <button hx-post="/contact" hx-target="#main" hx-include="#search">
-        Search The Contacts
-      </button>
-  </form>
+        <h2>Form elements</h2>
 
-</div>
+        <label for="search">Search Contacts:</label>
+        <input id="search" name="q" type="search" placeholder="Search Contacts">
+        <button hx-post="/contact"
+                hx-target="#main"
+                hx-include="#search">
+            Search Contacts
+        </button>
 
-<table>
+    </form>
+</section>
+<!-- Form elements-->
+
+<!-- Tables -->
+<section id="tables">
+<h2>Tables</h2>
+<figure>
+  <table role="grid">
     <thead>
-    <tr>
+      <tr>
         <th>First</th>
         <th>Last</th>
         <th>Phone</th>
         <th>Email</th>
         <th></th>
-    </tr>
+      </tr>
     </thead>
-
     <tbody>
-    {{ template "contacts" . }}
+        {{ template "contacts" . }}
     </tbody>
-</table>
+  </table>
+</figure>
+</section>
+<!-- ./ Tables -->
 
-<p>
-    <a href="/contact/new">Add Contact</a>
-</p>
+<button hx-get="/contact/new"
+        hx-target="body">
+    Add Contact
+</button>
 
 {{ end }}

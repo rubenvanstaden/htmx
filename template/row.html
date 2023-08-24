@@ -1,7 +1,6 @@
 {{ block "contacts" . }}
 
 {{ range .Contacts }}
-
 <tr>
     <td>{{ .First }}</td>
     <td>{{ .Last }}</td>
@@ -12,7 +11,19 @@
         <a href="/contact/{{.Id}}">View</a>
     </td>
 </tr>
+{{ end }}
 
+{{ if eq (len .Contacts) 10 }}
+<tr>
+    <td colspan="5" style="text-align: center">
+        <button hx-target="closest tr"
+                hx-swap="outerHTML"
+                hx-select="tbody > tr"
+                hx-get="/contact?page={{ add .Page 1 }}">
+          Load More
+        </button>
+    </td>
+</tr>
 {{ end }}
 
 {{ end }}

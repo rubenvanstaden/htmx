@@ -111,13 +111,6 @@ func (s *Handler) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 
 func (s *Handler) SaveProfile(w http.ResponseWriter, r *http.Request) {
 
-	log.Println("Editing Profile POST")
-
-	data := Data{
-		Title:       "HTMX with Go",
-		SearchQuery: "",
-	}
-
 	pubkey := r.FormValue("pubkey")
 	email := r.FormValue("email")
 
@@ -129,6 +122,7 @@ func (s *Handler) SaveProfile(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	data := Data{}
 	err = s.repository.Store(c)
 	if err != nil {
 		data.Profiles = append(data.Profiles, c)
@@ -140,26 +134,27 @@ func (s *Handler) SaveProfile(w http.ResponseWriter, r *http.Request) {
 
 func (s *Handler) EditProfile(w http.ResponseWriter, r *http.Request) {
 
-	log.Println("Editing Profile GET")
+	vars := mux.Vars(r)
+	pubkey := vars["pubkey"]
+    if pubkey == "" {
+        log.Fatalln("pubkey cannot be empty")
+    }
+	p, err := s.repository.Find(pubkey)
+    if err != nil {
+        log.Fatalln(err)
+    }
+
+	data := Data{}
+	data.Profiles = append(data.Profiles, p)
+    if len(data.Profiles) != 1 {
+        log.Fatalln("cannot edit more than one profile")
+    }
 
 	tmpl, err := template.ParseFiles("template/layout.html", "template/edit.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	data := Data{
-		Title:       "HTMX with Go",
-		SearchQuery: "",
-	}
-
-	vars := mux.Vars(r)
-	pubkey := vars["pubkey"]
-
-	c := s.repository.Find(pubkey)
-
-	data.Profiles = append(data.Profiles, c)
-
 	tmpl.ExecuteTemplate(w, "edit.html", data)
 }
 
@@ -167,37 +162,36 @@ func (s *Handler) ShowProfile(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Viewing Profile")
 
-	tmpl, err := template.ParseFiles("template/show.html")
+	vars := mux.Vars(r)
+	pubkey := vars["pubkey"]
+    if pubkey == "" {
+        log.Fatalln("pubkey cannot be empty")
+    }
+	p, err := s.repository.Find(pubkey)
+    if err != nil {
+        log.Fatalln(err)
+    }
+
+	tmpl, err := template.ParseFiles("template/layout.html", "template/show.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	vars := mux.Vars(r)
-	pubkey := vars["pubkey"]
-
-	c := s.repository.Find(pubkey)
-
-	tmpl.ExecuteTemplate(w, "show.html", c)
+	tmpl.ExecuteTemplate(w, "show.html", p)
 }
 
 func (s *Handler) NewProfile(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Getting new contact")
 
-	data := Data{
-		Title:       "HTMX with Go",
-		SearchQuery: "",
-	}
+	data := Data{}
+	data.Profiles = append(data.Profiles, &Profile{})
 
 	tmpl, err := template.ParseFiles("template/layout.html", "template/new.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-
-	data.Profiles = append(data.Profiles, &Profile{})
-
 	tmpl.ExecuteTemplate(w, "new.html", data)
 }
 

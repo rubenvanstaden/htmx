@@ -21,8 +21,8 @@ func (s *Repository) All() []*Profile {
 	return profiles
 }
 
-func (s *Repository) Find(id string) *Profile {
-	return s.db[id]
+func (s *Repository) Find(id string) (*Profile, error) {
+	return s.db[id], nil
 }
 
 func (s *Repository) Search(search string) []*Profile {

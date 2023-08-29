@@ -5,17 +5,17 @@
 
     <!-- Form elements-->
     <section id="form">
-    <form action="/contact/{{.Id}}/edit" method="post">
+    <form action="/contact/{{ .PubKey }}/edit" method="post">
 
         <h2>Contact Values</h2>
 
         <!-- Email -->
         <label for="email">Email</label>
         <input name="email" id="email" type="text"
-            hx-get="/contact/{{.Id}}/email"
+            hx-get="/contact/{{ .PubKey }}/email"
             hx-target="next .error"
             hx-trigger="change, keyup delay:200ms changed" (1)
-            placeholder="Email" value="{{.Email}}">
+            placeholder="Email" value="{{ .Email }}">
         <small class="error text-danger"></small>
 
         <!-- Username -->
@@ -27,7 +27,7 @@
             <button type="submit">Submit</button>
 
             <button class="secondary"
-                    hx-delete="/contact/{{ .Id }}"
+                    hx-delete="/contact/{{ .PubKey }}"
                     hx-push-url="true"
                     hx-confirm="Are you sure you want to delete this contact?"
                     hx-target="body">

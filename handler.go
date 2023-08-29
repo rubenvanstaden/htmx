@@ -46,17 +46,15 @@ func (s *Handler) SearchProfile(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	data := Data{
-		Page:        page,
-		Title:       "HTMX with Go",
-		Profiles:    contacts,
-		SearchQuery: search,
-	}
-
 	tmpl, err := template.New("home").Funcs(funcMap).ParseFiles("template/layout.html", "template/index.html", "template/row.html")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
+	}
+	data := Data{
+		Page:        page,
+		Profiles:    contacts,
+		SearchQuery: search,
 	}
 	tmpl.ExecuteTemplate(w, "layout.html", data)
 }
@@ -106,7 +104,13 @@ func (s *Handler) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 
 	s.repository.Delete(pubkey)
 
-	http.Redirect(w, r, "/contact", http.StatusSeeOther)
+    if r.Header.Get("HX-Trigger") == "delete-btn" {
+        log.Println("Header DeLETE")
+        http.Redirect(w, r, "/contact", http.StatusSeeOther)
+        return
+    }
+
+	w.WriteHeader(http.StatusOK)
 }
 
 func (s *Handler) SaveProfile(w http.ResponseWriter, r *http.Request) {

@@ -1,6 +1,8 @@
 package main
 
 import (
+	"sort"
+	"strconv"
 	"strings"
 )
 
@@ -18,6 +20,13 @@ func (s *Repository) All() []*Profile {
 	for _, v := range s.db {
 		profiles = append(profiles, v)
 	}
+
+	sort.Slice(profiles, func(i, j int) bool {
+		intI, _ := strconv.Atoi(strings.TrimPrefix(profiles[i].PubKey, "npub"))
+		intJ, _ := strconv.Atoi(strings.TrimPrefix(profiles[j].PubKey, "npub"))
+		return intI < intJ
+	})
+
 	return profiles
 }
 

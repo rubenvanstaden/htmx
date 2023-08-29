@@ -7,10 +7,15 @@
     <td>{{ .PubKey }}</td>
     <td>
         <div class="grid">
-          <p>
+            <p>
             <a href="/contact/{{ .PubKey }}/edit">Edit</a>
           <p>
             <a href="/contact/{{ .PubKey }}">View</a>
+          <p>
+            <a href="#" hx-delete="/contact/{{ .PubKey }}"
+                hx-swap="outerHTML"
+                hx-confirm="Are you sure you want to delete this contact?"
+                hx-target="closest tr">Delete</a>
           </p>
         </div>
     </td>

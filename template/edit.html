@@ -26,7 +26,7 @@
 
             <button type="submit">Submit</button>
 
-            <button class="secondary"
+            <button class="secondary" id="delete-btn"
                     hx-delete="/contact/{{ .PubKey }}"
                     hx-push-url="true"
                     hx-confirm="Are you sure you want to delete this contact?"

@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/mail"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 )
@@ -51,6 +52,19 @@ func (s *Client) Delete(id int) {
 	delete(s.db, id)
 }
 
+func Search(search string, c []*Contact) []*Contact {
+
+  contacts := []*Contact{}
+
+  for _, contact := range c {
+    if strings.Contains(contact.First, search) {
+      contacts = append(contacts, contact)
+    }
+  }
+
+  return contacts
+}
+
 func (s *Client) Update(id int, firstName, lastName, phone, email string) *Contact {
 
 	c := &Contact{
@@ -75,7 +89,7 @@ func main() {
 
 		client.db[i] = &Contact{
 			Id:    i,
-			First: "alice",
+			First: fmt.Sprintf("alice%d", i),
 			Email: "alice@gmail.com",
 			Phone: fmt.Sprintf("000-%d", i),
 		}
@@ -212,18 +226,12 @@ func (s *Client) ContactViewHandler(w http.ResponseWriter, r *http.Request) {
 	tmpl.ExecuteTemplate(w, "show.html", c)
 }
 
-func (s *Client) PagingContacts(w http.ResponseWriter, r *http.Request) {
+func (s *Client) paging(pageStr string) (int, []*Contact) {
 
-	log.Println("Paging contacts")
-
-	pageStr := r.URL.Query().Get("page")
 	page, _ := strconv.Atoi(pageStr)
 	if page < 1 {
 		page = 1
 	}
-
-	log.Println(pageStr)
-	log.Println(page)
 
 	var contacts []*Contact
 	for _, c := range s.db {
@@ -236,23 +244,42 @@ func (s *Client) PagingContacts(w http.ResponseWriter, r *http.Request) {
 		endIndex = len(contacts)
 	}
 
-	data := Data{
-		Page:     page,
-		Title:    "HTMX with Go",
-		Contacts: contacts[startIndex:endIndex],
-	}
+    return page, contacts[startIndex:endIndex]
+}
 
-	log.Println(len(data.Contacts))
+func (s *Client) PagingContacts(w http.ResponseWriter, r *http.Request) {
 
-	tmpl, err := template.New("pagination").Funcs(funcMap).ParseFiles("template/layout.html", "template/index.html", "template/row.html")
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
+	log.Println("Paging contacts")
 
-	log.Println(tmpl)
+    page, contacts := s.paging(r.URL.Query().Get("page"))
 
-	tmpl.ExecuteTemplate(w, "layout.html", data)
+    search := r.URL.Query().Get("q")
+
+    log.Printf("q: %s", search)
+
+    header := r.Header.Get("HX-Trigger")
+
+    if search != "" {
+        if header == "search" {
+            log.Println("Header search FOUND")
+            contacts = Search(search, contacts)
+        }
+    }
+
+    data := Data{
+        Page:     page,
+        Title:    "HTMX with Go",
+        Contacts: contacts,
+        SearchQuery: search,
+    }
+
+    tmpl, err := template.New("pagination").Funcs(funcMap).ParseFiles("template/layout.html", "template/index.html", "template/row.html")
+    if err != nil {
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+        return
+    }
+    tmpl.ExecuteTemplate(w, "layout.html", data)
+
 }
 
 func (s *Client) ContactHandler(w http.ResponseWriter, r *http.Request) {

@@ -1,4 +1,4 @@
-{{ range .Contacts }}
+{{ range .Profiles }}
 
 <!-- Main -->
 <main class="container">
@@ -19,8 +19,8 @@
         <small class="error text-danger"></small>
 
         <!-- Username -->
-        <label for="first_name">Username</label>
-        <input name="first_name" id="first_name" type="text" placeholder="First Name" value="{{ .First }}">
+        <label for="name">Username</label>
+        <input name="name" id="name" type="text" placeholder="Name" value="{{ .Name }}">
 
         <div class="grid">
 

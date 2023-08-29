@@ -1,14 +1,14 @@
 {{ block "content" . }}
 
-<h1>{{ .First }} {{ .Last }}</h1>
+<h1>{{ .Name }}</h1>
 
 <div>
-    <div>Phone: {{ .Phone }}</div>
     <div>Email: {{ .Email }}</div>
+    <div>PubKey: {{ .PubKey }}</div>
 </div>
 
 <p>
-    <a href="/contact/{{ .Id }}/edit">Edit</a>
+    <a href="/contact/{{ .PubKey }}/edit">Edit</a>
     <a href="/contact">Back</a>
 </p>
 

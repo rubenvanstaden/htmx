@@ -1,4 +1,4 @@
-{{ range .Contacts }}
+{{ range .Profiles }}
 
 <!-- Main -->
 <main class="container">
@@ -7,20 +7,21 @@
     <section id="form">
     <form action="/contact/new" method="post">
 
-        <h2>Contact Values</h2>
+        <h2>Profile Values</h2>
+
+        <!-- Username -->
+        <label for="name">Username</label>
+        <input name="name" id="name" type="text" placeholder="Name" value="{{ .Name }}">
 
         <!-- Email -->
         <label for="email">Email</label>
         <input name="email" id="email" type="text"
-            hx-get="/contact/{{.Id}}/email"
+            hx-get="/contact/{{ .PubKey }}/email"
             hx-target="next .error"
-            hx-trigger="change, keyup delay:200ms changed" (1)
-            placeholder="Email" value="{{.Email}}">
+            hx-trigger="change, keyup delay:200ms changed"
+            placeholder="Email" value="{{ .Email }}">
         <small class="error text-danger"></small>
 
-        <!-- Username -->
-        <label for="first_name">Username</label>
-        <input name="first_name" id="first_name" type="text" placeholder="First Name" value="{{ .First }}">
 
         <button type="submit">Submit</button>
 

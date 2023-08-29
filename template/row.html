@@ -1,24 +1,22 @@
 {{ block "contacts" . }}
 
-{{ range .Contacts }}
+{{ range .Profiles }}
 <tr>
-    <td>{{ .First }}</td>
-    <td>{{ .Last }}</td>
-    <td>{{ .Phone }}</td>
+    <td>{{ .Name }}</td>
     <td>{{ .Email }}</td>
     <td>
         <div class="grid">
           <p>
-            <a href="/contact/{{ .Id }}/edit">Edit</a>
+            <a href="/contact/{{ .PubKey }}/edit">Edit</a>
           <p>
-            <a href="/contact/{{ .Id }}">View</a>
+            <a href="/contact/{{ .PubKey }}">View</a>
           </p>
         </div>
     </td>
 </tr>
 {{ end }}
 
-{{ if eq (len .Contacts) 10 }}
+{{ if eq (len .Profiles) 10 }}
 <tr>
     <td colspan="5" style="text-align: center">
         <span hx-target="closest tr"

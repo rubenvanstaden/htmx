@@ -1,40 +1,44 @@
 {{ block "content" . }}
 
 <!-- Form elements-->
-<section id="form">
-    <form action="/contact" method="get" class="tool-bar">
-
-        <h2>Form elements</h2>
-
-        <input id="search" type="search" name="q" value="{{ .SearchQuery }}"
-            hx-get="/contact"
-            hx-trigger="search, keyup delay:200ms changed"
-            hx-target="tbody"
-            hx-push-url="true"
-            hx-select="tbody tr"/>
-        <input type="submit" value="Search"/>
-
-    </form>
-</section>
+<form action="/contact" method="get" class="tool-bar">
+    <h2>Form elements</h2>
+    <input id="search" type="search" name="q" value="{{ .SearchQuery }}"
+        hx-get="/contact"
+        hx-trigger="search, keyup delay:200ms changed"
+        hx-target="tbody"
+        hx-push-url="true"
+        hx-select="tbody tr"/>
+    <input type="submit" value="Search"/>
+</form>
 <!-- Form elements-->
 
 <!-- Tables -->
 <section id="tables">
-<h2>Tables</h2>
 <figure>
-  <table role="grid">
+<form>
+
+    <table role="grid">
     <thead>
-      <tr>
+    <tr>
+        <th></th>
         <th>Name</th>
         <th>Email</th>
         <th>PubKey</th>
         <th></th>
-      </tr>
+    </tr>
     </thead>
     <tbody>
         {{ template "contacts" . }}
     </tbody>
-  </table>
+    </table>
+
+    <button hx-delete="/contact"
+            hx-confirm="Are you sure you want to delete these contacts?"
+            hx-target="#tables">
+        Delete Selected Contacts
+    </button>
+</form>
 </figure>
 </section>
 <!-- ./ Tables -->

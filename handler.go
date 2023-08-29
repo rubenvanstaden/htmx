@@ -3,9 +3,11 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"net/mail"
+	"net/url"
 	"strconv"
 
 	"github.com/gorilla/mux"
@@ -95,6 +97,51 @@ func (s *Handler) ParseEmail(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Handler) DeleteBulk(w http.ResponseWriter, r *http.Request) {
+
+	log.Println("Deleting BULK")
+
+	// Read the request body
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+		return
+	}
+	r.Body.Close() // Always close the body when done
+
+	// Parse the form data from the body
+	values, err := url.ParseQuery(string(bodyBytes))
+	if err != nil {
+		http.Error(w, "Failed to parse form data", http.StatusInternalServerError)
+		return
+	}
+
+	// Retrieve the selected_contact_ids values
+	selectedContactIDs := values["selected_pubkeys"]
+	if selectedContactIDs == nil {
+		http.Error(w, "No contacts selected", http.StatusBadRequest)
+		return
+	}
+
+	for _, pub := range selectedContactIDs {
+		log.Printf("pubkey deleteing: %s", pub)
+		s.repository.Delete(pub)
+	}
+
+	page, profiles := s.paging(r.URL.Query().Get("page"))
+	data := Data{
+		Page:     page,
+		Profiles: profiles,
+	}
+
+	tmpl, err := template.ParseFiles("template/layout.html", "template/index.html", "template/row.html")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	tmpl.ExecuteTemplate(w, "layout.html", data)
+}
+
 func (s *Handler) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Deleting Profile")
@@ -104,11 +151,11 @@ func (s *Handler) DeleteProfile(w http.ResponseWriter, r *http.Request) {
 
 	s.repository.Delete(pubkey)
 
-    if r.Header.Get("HX-Trigger") == "delete-btn" {
-        log.Println("Header DeLETE")
-        http.Redirect(w, r, "/contact", http.StatusSeeOther)
-        return
-    }
+	if r.Header.Get("HX-Trigger") == "delete-btn" {
+		log.Println("Header DeLETE")
+		http.Redirect(w, r, "/contact", http.StatusSeeOther)
+		return
+	}
 
 	w.WriteHeader(http.StatusOK)
 }
@@ -140,19 +187,19 @@ func (s *Handler) EditProfile(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	pubkey := vars["pubkey"]
-    if pubkey == "" {
-        log.Fatalln("pubkey cannot be empty")
-    }
+	if pubkey == "" {
+		log.Fatalln("pubkey cannot be empty")
+	}
 	p, err := s.repository.Find(pubkey)
-    if err != nil {
-        log.Fatalln(err)
-    }
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	data := Data{}
 	data.Profiles = append(data.Profiles, p)
-    if len(data.Profiles) != 1 {
-        log.Fatalln("cannot edit more than one profile")
-    }
+	if len(data.Profiles) != 1 {
+		log.Fatalln("cannot edit more than one profile")
+	}
 
 	tmpl, err := template.ParseFiles("template/layout.html", "template/edit.html")
 	if err != nil {
@@ -168,13 +215,13 @@ func (s *Handler) ShowProfile(w http.ResponseWriter, r *http.Request) {
 
 	vars := mux.Vars(r)
 	pubkey := vars["pubkey"]
-    if pubkey == "" {
-        log.Fatalln("pubkey cannot be empty")
-    }
+	if pubkey == "" {
+		log.Fatalln("pubkey cannot be empty")
+	}
 	p, err := s.repository.Find(pubkey)
-    if err != nil {
-        log.Fatalln(err)
-    }
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	tmpl, err := template.ParseFiles("template/layout.html", "template/show.html")
 	if err != nil {

@@ -32,7 +32,8 @@ func main() {
 	}
 
 	r.HandleFunc("/", handler.IndexHandler)
-	r.HandleFunc("/contact", handler.SearchProfile)
+	r.HandleFunc("/contact", handler.SearchProfile).Methods("GET")
+	r.HandleFunc("/contact", handler.DeleteBulk).Methods("DELETE")
 	r.HandleFunc("/contact/new", handler.NewProfile).Methods("GET")
 	r.HandleFunc("/contact/new", handler.AddProfile).Methods("POST")
 	r.HandleFunc("/contact/{pubkey:[a-zA-Z0-9]+}/email", handler.ParseEmail).Methods("GET")

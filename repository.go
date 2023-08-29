@@ -16,6 +16,7 @@ func (s *Repository) Store(profile *Profile) error {
 }
 
 func (s *Repository) All() []*Profile {
+
 	var profiles []*Profile
 	for _, v := range s.db {
 		profiles = append(profiles, v)
